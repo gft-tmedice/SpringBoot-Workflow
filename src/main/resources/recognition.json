@@ -1,0 +1,170 @@
+{
+  "version": "1.0",
+  "processName": "Recognition",
+  "startActivity": "DOCUMENT_COLLECTION",
+  "workflow": {
+    "steps": [{
+      "name": "DOCUMENT_COLLECTION",
+      "events": [{
+        "name": "ocr",
+        "destination": "OCR",
+        "actions": [{
+          "actionName": "executeOcr",
+          "actionClass": "ocrExecution"
+        }]
+      }]
+    },
+      {
+        "name": "OCR",
+        "events": [{
+          "name": "doc_error",
+          "destination": "DOCUMENT_ERROR"
+        },
+          {
+            "name": "doc_expired",
+            "destination": "DOCUMENT_EXPIRED"
+          },
+          {
+            "name": "doc_accept",
+            "destination": "DOCUMENT_CONFIRMATION"
+          },
+          {
+            "name": "conformity_check",
+            "destination": "CONFORMITY_CHECK",
+            "actions": [{
+              "actionName": "executeConformityCheck",
+              "actionClass": "conformityCheckExecution"
+            }]
+          }
+        ]
+      },
+      {
+        "name": "DOCUMENT_ERROR",
+        "events": [{
+          "name": "restart_collection",
+          "destination": "DOCUMENT_COLLECTION"
+        },
+          {
+            "name": "doc_accept",
+            "destination": "DOCUMENT_CONFIRMATION"
+          }
+        ]
+      },
+      {
+        "name": "DOCUMENT_EXPIRED",
+        "events": [{
+          "name": "restart_collection",
+          "destination": "DOCUMENT_COLLECTION"
+        }]
+      },
+      {
+        "name": "CONFORMITY_CHECK",
+        "events": [{
+          "name": "doc_accept",
+          "destination": "DOCUMENT_CONFIRMATION"
+        },
+          {
+            "name": "conformity_error",
+            "destination": "CONFORMITY_ERROR"
+          }
+        ]
+      },
+      {
+        "name": "CONFORMITY_ERROR",
+        "events": [{
+          "name": "invalidate_restart",
+          "destination": "DOCUMENT_COLLECTION",
+          "actions": [{
+            "actionName": "executeDocumentConfirmationInvalidate",
+            "actionClass": "documentConfirmationExecution"
+          }]
+        },
+          {
+            "name": "doc_accept",
+            "destination": "DOCUMENT_CONFIRMATION"
+          }
+        ]
+      },
+      {
+        "name": "DOCUMENT_CONFIRMATION",
+        "events": [{
+          "name": "start_face_match",
+          "destination": "LIVENESS",
+          "actions": [{
+            "actionName": "executeDocumentConfirmation",
+            "actionClass": "documentConfirmationExecution"
+          },
+            {
+              "actionName": "executeDocumentMetadata",
+              "actionClass": "documentMetadataExecution"
+            }
+          ]
+        }]
+      },
+      {
+        "name": "LIVENESS",
+        "events": [{
+          "name": "face_match",
+          "destination": "FACE_MATCHING",
+          "actions": [{
+            "actionName": "executeFaceMatch",
+            "actionClass": "faceMatchExecution"
+          }]
+        }]
+      },
+      {
+        "name": "FACE_MATCHING",
+        "events": [{
+          "name": "restart_face_match",
+          "destination": "LIVENESS",
+          "actions": [{
+            "actionName": "executeIdentityScoreRestart",
+            "actionClass": "identityScoreExecution"
+          }]
+        },
+          {
+            "name": "abort",
+            "destination": "FAIL",
+            "actions": [{
+              "actionName": "executeIdentityScoreKo",
+              "actionClass": "identityScoreExecution"
+            },
+              {
+                "actionName": "executeAbortProcess",
+                "actionClass": "abortProcessExecution"
+              }
+            ]
+          },
+          {
+            "name": "success",
+            "destination": "SUCCESS",
+            "actions": [{
+              "actionName": "executeIdentityScoreOk",
+              "actionClass": "identityScoreExecution"
+            }]
+          },
+          {
+            "name": "human_check",
+            "destination": "HUMAN_CHECK",
+            "actions": [{
+              "actionName": "executeIdentityScoreHumanCheck",
+              "actionClass": "identityScoreExecution"
+            }]
+          }
+        ]
+      },
+      {
+        "name": "HUMAN_CHECK",
+        "events": [{
+          "name": "abort",
+          "destination": "FAIL"
+        },
+          {
+            "name": "success",
+            "destination": "SUCCESS"
+          }
+        ]
+      }
+    ]
+  }
+}

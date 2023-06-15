@@ -1,0 +1,21 @@
+{
+	"version": "string",
+	"processName": "string",
+	"startActivity": "string",
+	"workflow": {
+		"steps": [{
+				"name": "string",
+				"events": [{
+					"name": "string",
+					"destination": "string",
+					"actions": [{
+						"actionName": "string",
+						"actionClass": "string"
+					}, {
+						"actionName": "string",
+						"actionClass": "string"
+					}]
+				}]
+		}]
+	}
+}

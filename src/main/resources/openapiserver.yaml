@@ -1,0 +1,219 @@
+swagger: "2.0"
+
+info:
+  version: 1.0.0
+  title: workflow API
+  description: APIs to interact with account objects
+  contact: { }
+
+schemes:
+  - "http"
+  - "https"
+host: "localhost"
+basePath: /
+
+tags:
+  - name: Workflow
+    description: workflow
+
+paths:
+  /startProcess:
+    get:
+      produces:
+        - "application/json"
+      tags:
+        - Workflow
+      operationId: startProcessUsingGET
+      responses:
+        200:
+          description: User event saved successfully.
+          schema:
+            $ref: "#/definitions/Process"
+        400:
+          description: User event couldn't have been saved.
+        500:
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+
+
+  /step/{uuid}/{stepName}:
+    get:
+      produces:
+        - "application/json"
+      tags:
+        - Workflow
+      operationId: stepByUuidAndEventNameUsingGET
+      parameters:
+        - $ref: '#/parameters/uuid'
+        - $ref: '#/parameters/stepName'
+      responses:
+        200:
+          description: Process updated successfully.
+          schema:
+            $ref: "#/definitions/Step"
+        404:
+          description: Process does not exists.
+        400:
+          description: Process couldn't have been updated.
+        500:
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+
+
+  /cancelProcess/{uuid}:
+    get:
+      produces:
+        - "application/json"
+      tags:
+        - Workflow
+      operationId: cancelProcessByUuidUsingGET
+      parameters:
+        - $ref: '#/parameters/uuid'
+      responses:
+        200:
+          description: Success.
+        404:
+          description: Process does not exists.
+        500:
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+
+
+  /endProcess/{uuid}:
+    get:
+      produces:
+        - "application/json"
+      tags:
+        - Workflow
+      operationId: endProcessByUuidUsingGET
+      parameters:
+        - $ref: '#/parameters/uuid'
+      responses:
+        200:
+          description: Process updated successfully.
+        404:
+          description: Process does not exists.
+        400:
+          description: Process couldn't have been updated.
+        500:
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+
+  /statusProcess/{uuid}:
+    get:
+      produces:
+        - "application/json"
+      tags:
+        - Workflow
+      operationId: statusProcessByUuidUsingGET
+      parameters:
+        - $ref: '#/parameters/uuid'
+      responses:
+        200:
+          description: Process status.
+          schema:
+            $ref: "#/definitions/Process"
+        404:
+          description: Process does not exists.
+        500:
+          description: An unexpected error occured.
+          schema:
+            $ref: "#/definitions/Error"
+
+parameters:
+  uuid:
+    description: UUID
+    name: uuid
+    in: path
+    required: true
+    type: string
+  stepName:
+    description: the step name
+    name: stepName
+    in: path
+    required: true
+    type: string
+  eventName:
+    description: the event name
+    name: eventName
+    in: path
+    required: true
+    type: string
+
+definitions:
+  Process:
+    properties:
+      processId:
+        type: string
+        format: UUID
+      processName:
+        type: string
+      processVersion:
+        type: string
+      processStatus:
+        type: string
+      currentStep:
+        type: string
+      parentProcessId:
+        type: string
+      creationTime:
+        type: string
+        format: date-time
+      currentStepEntryTime:
+        type: string
+        format: date-time
+      closingTime:
+        type: string
+        format: date-time
+      updateTime:
+        type: string
+        format: date-time
+
+  Step:
+    properties:
+      name:
+        type: string
+      events:
+        description: Event list
+        type: array
+        items:
+          $ref: '#/definitions/Event'
+
+  Event:
+    properties:
+      name:
+        type: string
+      destination:
+        type: string
+      actions:
+        description: Action list
+        type: array
+        items:
+          $ref: '#/definitions/Action'
+
+  Action:
+    properties:
+      actionName:
+        type: string
+      actionClass:
+        type: string
+
+
+  Meta:
+    properties:
+      id:
+        type: string
+      value:
+        type: string
+
+
+  Error:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
